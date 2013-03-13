@@ -10,8 +10,8 @@ import java.util.List;
 
 
 public class SVMLightReader {
-    public static List<VectorInstance> indexInstances(File dataFile) {
-        List<VectorInstance> instances = new ArrayList<>();
+    public static List<MapInstance<Integer>> indexInstances(File dataFile) {
+        List<MapInstance<Integer>> instances = new ArrayList<>();
 
         // line formatted as: label feature1:value1 feature2:value2 ..."
         try (BufferedReader reader = new BufferedReader(new FileReader(dataFile))) {
@@ -20,14 +20,14 @@ public class SVMLightReader {
                 String[] splitLine = line.split("\\s+");
 
                 String label = splitLine[0];
-                VectorInstance instance = new VectorInstance();
+                MapInstance<Integer> instance = new MapInstance<>();
                 instance.setLabel(label);
 
                 for (int i = 1; i < splitLine.length; i++) {
                     String[] featureSplit = splitLine[i].split(":");
                     if (featureSplit.length != 2) continue;
                     String feature = featureSplit[0];
-                    double value = Double.parseDouble(featureSplit[1]);
+                    int value = Integer.parseInt(featureSplit[1]);
                     instance.addFeature(feature, value);
                 }
 
