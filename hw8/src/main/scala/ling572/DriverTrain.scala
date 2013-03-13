@@ -52,6 +52,6 @@ object DriverTrain extends App {
   
   ///////////// train /////////////////
   model.buildModel();
-  model.printModel(this.modelFile)
+  model.generateModel(this.modelFile)
 }
 

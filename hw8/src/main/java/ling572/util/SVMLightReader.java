@@ -28,6 +28,10 @@ public class SVMLightReader {
                     if (featureSplit.length != 2) continue;
                     String feature = featureSplit[0];
                     int value = Integer.parseInt(featureSplit[1]);
+                    
+                    if (value==0)
+                    	continue;
+                    
                     instance.addFeature(feature, value);
                 }
 
