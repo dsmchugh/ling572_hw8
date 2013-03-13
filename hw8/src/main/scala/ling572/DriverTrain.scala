@@ -2,7 +2,7 @@ package ling572
 
 import java.io.{PrintWriter, File}
 import scala.collection.JavaConverters._
-import util.{ConditionalFreqDist, VectorInstance, SVMLightReader}
+import util.{ConditionalFreqDist, SVMLightReader}
 
 object DriverTrain extends App {
 
@@ -44,10 +44,11 @@ object DriverTrain extends App {
 
   ////////////// setup ///////////////////
   val sysOut = new PrintWriter(modelFile)
-  val instances = SVMLightReader.indexInstances(DriverTrain.this.trainData);
+  val instances = SVMLightReader.indexInstances(this.trainData);
   
   val model = new TBLModel()
   model.setInstances(instances)
+  model.setMinGain(this.minGain)
   
   ///////////// train /////////////////
   model.buildModel();
