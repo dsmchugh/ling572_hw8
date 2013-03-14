@@ -31,7 +31,6 @@ public class TBLModel {
 		this.defaultLabel = instances.get(0).getLabel();
 		
 		for (int i=0; i<this.instances.size(); i++) {
-			this.curLabels.put(i, this.defaultLabel);
 			this.allLabels.add(this.instances.get(i).getLabel());
 		}
 		
@@ -48,7 +47,7 @@ public class TBLModel {
 		
 		for (int i=0; i<this.instances.size(); i++) {
 			Instance<Integer> instance = this.instances.get(i);
-			String curLabel = this.curLabels.get(i);
+			String curLabel = this.getCurLabel(i);
 			for (String featName : instance.getFeatures().keySet()) {
 				if (featName.equals(transformation.getFeatName()) && curLabel.equals(transformation.getFromClass())) {
 					this.curLabels.put(i, transformation.getToClass());
@@ -64,8 +63,8 @@ public class TBLModel {
 		for (int i=0; i<this.instances.size(); i++) {
 			Instance<Integer> instance = this.instances.get(i);
 			String goldClass = instance.getLabel(); 
-			String fromClass = this.curLabels.get(i);
-			
+			String fromClass = this.getCurLabel(i);
+				
 			for (Map.Entry<String, Integer> entry : instance.getFeatures().entrySet()) {
 				String featName = entry.getKey();
 
@@ -99,6 +98,15 @@ public class TBLModel {
 			}
 			
 		}	
+	}
+	
+	private String getCurLabel(int i) {
+		String curLabel = this.curLabels.get(i);
+		
+		if (curLabel==null)
+			curLabel = this.defaultLabel;
+		
+		return curLabel;
 	}
 	
 	public void generateModel(File modelFile) {
