@@ -22,10 +22,6 @@ public class TBLModel {
 		this.instances = instances;
 	}
 	
-	public List<MapInstance<Integer>> getInstances() {
-		return this.instances;
-	}
-	
 	public void setMinGain(int minGain) {
 		this.minGain = minGain;
 	}
@@ -89,8 +85,6 @@ public class TBLModel {
 					  else
 						gain--;
 					
-					
-					
 					transGains.put(trans, gain);
 				}
 			}
@@ -125,26 +119,4 @@ public class TBLModel {
 	private Set<String> getLabels() {
 		return this.allLabels;
 	}
-
-	static class ValueDescComparator implements Comparator<Transformation> {
-		Map<Transformation,Integer> map;
-		
-		public ValueDescComparator(Map<Transformation,Integer> map) {
-			this.map = map;
-		}
-		
-		@Override
-		public int compare(Transformation o1, Transformation o2) {
-			Integer x = map.get(o1);
-			Integer y = map.get(o2);
-			
-			if (x.equals(y)) {
-				return o1.toString().compareTo(o2.toString());
-			}
-			
-			return -x.compareTo(y);
-		}
-		
-	}
-
 }
