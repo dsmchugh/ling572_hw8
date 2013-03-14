@@ -2,6 +2,7 @@ package ling572;
 
 import java.util.*;
 import java.io.*;
+
 import ling572.util.*;
 
 public class TBLModel {
@@ -9,16 +10,16 @@ public class TBLModel {
 	private String defaultLabel = null;
 	private int minGain = 0;
 	
+	private Set<String> allLabels = new HashSet<>();
 	private Map<Integer,String> curLabels = new HashMap<>();
 	
 	private int highestGain = 0;
 	private Transformation highestGainTrans;
 	
+	private List<Transformation> transformations = new ArrayList<>();
+	
 	public void setInstances(List<MapInstance<Integer>> instances) {
 		this.instances = instances;
-		
-		//	"initial annotator" tags each instance with first class in training data
-		this.defaultLabel = instances.get(0).getLabel();
 	}
 	
 	public List<MapInstance<Integer>> getInstances() {
@@ -30,24 +31,39 @@ public class TBLModel {
 	}
 	
 	public void buildModel() {
-		//	set initial annotation
-		for (int i=0; i<this.instances.size(); i++)
+		// initial annotation--each instance tagged with first class in training data
+		this.defaultLabel = instances.get(0).getLabel();
+		
+		for (int i=0; i<this.instances.size(); i++) {
 			this.curLabels.put(i, this.defaultLabel);
-
-		this.calculateInformationGain();
+			this.allLabels.add(this.instances.get(i).getLabel());
+		}
+		
+		this.calculateGain();
 		
 		while (this.highestGain >= this.minGain) {
 			this.applyTransformation(this.highestGainTrans);
-			this.calculateInformationGain();
+			this.calculateGain();
 		}
 	}
 	
-	private void applyTransformation(Transformation highestGainTransformation) {
-		//	TODO update curLabels affected by transformation
+	private void applyTransformation(Transformation transformation) {
+		this.transformations.add(transformation);
+		
+		for (int i=0; i<this.instances.size(); i++) {
+			Instance<Integer> instance = this.instances.get(i);
+			String curLabel = this.curLabels.get(i);
+			for (String featName : instance.getFeatures().keySet()) {
+				if (featName.equals(transformation.getFeatName()) && curLabel.equals(transformation.getFromClass())) {
+					this.curLabels.put(i, transformation.getToClass());
+					break;
+				}
+			}
+		}
 	}
 	
-	private void calculateInformationGain() {
-		Map<Transformation,Integer> informationGain = new HashMap<>();
+	private void calculateGain() {
+		Map<Transformation,Integer> transGains = new HashMap<>();
 		
 		for (int i=0; i<this.instances.size(); i++) {
 			Instance<Integer> instance = this.instances.get(i);
@@ -63,30 +79,72 @@ public class TBLModel {
 					
 					Transformation trans = new Transformation(featName, fromClass, toClass);
 					
-					Integer infoGain = informationGain.get(trans);
+					Integer gain = transGains.get(trans);
 					
-					if (infoGain==null) {
-						infoGain=0;
-						informationGain.put(trans, infoGain);
-					}
+					if (gain==null)
+						gain=0;
 					
 					if (goldClass.equals(toClass))
-						infoGain++;
+						gain++;
 					  else
-						infoGain--;
+						gain--;
+					
+					
+					
+					transGains.put(trans, gain);
 				}
 			}
 		}
 		
-		//	TODO determine highest gain and set highestGain and highestGainTrasn vars
+		this.highestGain = 0;
+		for (Map.Entry<Transformation, Integer> entry : transGains.entrySet()) {
+			if (entry.getValue() > highestGain) {
+				this.highestGain = entry.getValue();
+				this.highestGainTrans = entry.getKey();
+				this.highestGainTrans.setNetGain(this.highestGain);
+			}
+			
+		}	
 	}
 	
 	public void generateModel(File modelFile) {
-		//	TODO print model
+		try(BufferedWriter writer = new BufferedWriter(new FileWriter(modelFile))) {
+			writer.write(defaultLabel);
+			writer.newLine();
+			
+			for (Transformation trans : this.transformations) {
+				writer.write(trans.toString() + " " + trans.getNetGain());
+				writer.newLine();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
 	}
 	
 	private Set<String> getLabels() {
-		return new HashSet<String>();
-		//	TODO get set of possible labels
+		return this.allLabels;
 	}
+
+	static class ValueDescComparator implements Comparator<Transformation> {
+		Map<Transformation,Integer> map;
+		
+		public ValueDescComparator(Map<Transformation,Integer> map) {
+			this.map = map;
+		}
+		
+		@Override
+		public int compare(Transformation o1, Transformation o2) {
+			Integer x = map.get(o1);
+			Integer y = map.get(o2);
+			
+			if (x.equals(y)) {
+				return o1.toString().compareTo(o2.toString());
+			}
+			
+			return -x.compareTo(y);
+		}
+		
+	}
+
 }

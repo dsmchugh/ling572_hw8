@@ -5,10 +5,16 @@ public class Transformation {
 	private String fromClass;
 	private String toClass;
 	
+	private int netGain = 0;
+	
 	public Transformation(String featName, String fromClass, String toClass) {
 		this.featName = featName;
 		this.fromClass = fromClass;
 		this.toClass = toClass;
+	}
+	
+	public Transformation(String transString) {
+		this.parseTransString(transString);
 	}
 	
 	public String getFeatName() {
@@ -21,6 +27,26 @@ public class Transformation {
 	
 	public String getToClass() {
 		return this.toClass;
+	}
+	
+	public int getNetGain() {
+		return this.netGain;
+	}
+	
+	public void setNetGain(int netGain) {
+		this.netGain = netGain;
+	}
+	
+	private void parseTransString(String transString) {
+		String[] splitString = transString.split("\\s");
+		
+		if (splitString.length != 4) 
+			return;	//	invalid string
+		
+		this.featName = splitString[0];
+		this.fromClass = splitString[1];
+		this.toClass = splitString[2];
+		this.netGain = Integer.parseInt(splitString[3]);
 	}
 	
 	@Override
@@ -38,4 +64,9 @@ public class Transformation {
 	public int hashCode() {
 		return this.toString().hashCode();
 	}
+	
+	@Override 
+	public boolean equals(Object other) {        
+        return other.toString().equals(this.toString());
+    }
 }
