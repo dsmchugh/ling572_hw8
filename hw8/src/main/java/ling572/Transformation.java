@@ -7,6 +7,8 @@ public class Transformation {
 	
 	private int netGain = 0;
 	
+	private String transString = null;
+	
 	public Transformation(String featName, String fromClass, String toClass) {
 		this.featName = featName;
 		this.fromClass = fromClass;
@@ -51,13 +53,11 @@ public class Transformation {
 	
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append(this.featName);
-		builder.append(' ');
-		builder.append(this.fromClass);
-		builder.append(' ');
-		builder.append(this.toClass);
-		return builder.toString();
+		if (this.transString == null) {
+			this.transString = this.featName +  " " + this.fromClass + " " + this.toClass;
+		}
+		
+		return this.transString;
 	}
 	
 	@Override
