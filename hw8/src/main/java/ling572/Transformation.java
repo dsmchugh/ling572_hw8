@@ -8,6 +8,7 @@ public class Transformation {
 	private int netGain = 0;
 	
 	private String transString = null;
+    private int hashCode = 0;
 	
 	public Transformation(String featName, String fromClass, String toClass) {
 		this.featName = featName;
@@ -62,7 +63,10 @@ public class Transformation {
 	
 	@Override
 	public int hashCode() {
-		return this.toString().hashCode();
+		if (this.hashCode == 0) {
+            this.hashCode = this.toString().hashCode();
+        }
+        return this.hashCode;
 	}
 	
 	@Override 
