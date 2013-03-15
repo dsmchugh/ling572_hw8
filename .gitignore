@@ -5,3 +5,11 @@
 *.war
 *.ear
 target/
+
+.DS_Store
+
+hw8/.cache
+
+hw8/.classpath
+
+hw8/.project

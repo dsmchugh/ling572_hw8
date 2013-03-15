@@ -42,6 +42,31 @@ public class TBLModel {
 		}
 	}
 	
+	public void loadModel(File model) {
+		try (BufferedReader reader = new BufferedReader(new FileReader(model))) {
+			String line = reader.readLine();
+			
+			if (line == null)
+				return;
+
+			this.defaultLabel = line;
+			
+			while ((line = reader.readLine()) != null) {
+				Transformation trans = new Transformation(line);
+				
+				if (!trans.isValid()) {
+					throw new IOException();
+				}
+				
+				this.transformations.add(trans);
+			}
+		} catch (IOException e) {
+			System.out.println("invalid model file");
+			e.printStackTrace();
+			System.exit(1);
+		}
+	}
+	
 	private void applyTransformation(Transformation transformation) {
 		this.transformations.add(transformation);
 		
@@ -124,6 +149,33 @@ public class TBLModel {
 		}
 	}
 	
+	public List<Transformation> processInstance(Instance<Integer> instance, int n) {
+		List<Transformation> transList = new ArrayList<>();
+		
+		if (n > this.transformations.size())
+			n = this.transformations.size();
+			
+		
+		int i = 0;
+		String curLabel = this.defaultLabel;
+		while (i<n) {
+			Transformation toTrans = this.transformations.get(i);
+			
+			if (instance.containsFeature(toTrans.getFeatName()) && curLabel.equals(toTrans.getFromClass())) {
+				curLabel = toTrans.getToClass();
+				transList.add(toTrans);
+			}
+			
+			i++;
+		}
+		
+		return transList;
+	}
+
+	public String getDefaultLabel() {
+		return this.defaultLabel;
+	}
+
 	private Set<String> getLabels() {
 		return this.allLabels;
 	}

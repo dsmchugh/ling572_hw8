@@ -40,6 +40,11 @@ public class Transformation {
 		this.netGain = netGain;
 	}
 	
+	public boolean isValid() {
+		
+		return this.featName != null && this.fromClass != null && this.toClass != null ? true : false;
+	}
+	
 	private void parseTransString(String transString) {
 		String[] splitString = transString.split("\\s");
 		
