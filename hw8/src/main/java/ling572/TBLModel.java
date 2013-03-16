@@ -11,7 +11,7 @@ public class TBLModel {
 	private int minGain = 0;
 	
 	private Set<String> allLabels = new HashSet<>();
-	private Map<Integer,String> curLabels = new HashMap<>();
+	//private Map<Integer,String> curLabels = new HashMap<>();
 	
 	private int highestGain = 0;
 	private Transformation highestGainTrans;
@@ -29,10 +29,11 @@ public class TBLModel {
 	public void buildModel() {
 		// initial annotation--each instance tagged with first class in training data
 		this.defaultLabel = instances.get(0).getLabel();
-		
-		for (int i=0; i<this.instances.size(); i++) {
-			this.allLabels.add(this.instances.get(i).getLabel());
-		}
+
+        for (MapInstance<Integer> instance : this.instances) {
+            this.allLabels.add(instance.getLabel());
+            instance.setCurrentLabel(defaultLabel);
+        }
 		
 		this.calculateGain();
 		
@@ -69,50 +70,48 @@ public class TBLModel {
 	
 	private void applyTransformation(Transformation transformation) {
 		this.transformations.add(transformation);
-		
-		for (int i=0; i<this.instances.size(); i++) {
-			Instance<Integer> instance = this.instances.get(i);
-			String curLabel = this.getCurLabel(i);
-			for (String featName : instance.getFeatures().keySet()) {
-				if (featName.equals(transformation.getFeatName()) && curLabel.equals(transformation.getFromClass())) {
-					this.curLabels.put(i, transformation.getToClass());
-					break;
-				}
-			}
-		}
+
+        for (MapInstance<Integer> instance : this.instances) {
+            String curLabel = instance.getCurrentLabel();
+            for (String featName : instance.getFeatures().keySet()) {
+                if (featName.equals(transformation.getFeatName()) && curLabel.equals(transformation.getFromClass())) {
+                    instance.setCurrentLabel(transformation.getToClass());
+                    break;
+                }
+            }
+        }
 	}
 	
 	private void calculateGain() {
 		Map<Transformation,Integer> transGains = new HashMap<>();
-		
-		for (int i=0; i<this.instances.size(); i++) {
-			Instance<Integer> instance = this.instances.get(i);
-			String goldClass = instance.getLabel(); 
-			String fromClass = this.getCurLabel(i);
-				
-			for (Map.Entry<String, Integer> entry : instance.getFeatures().entrySet()) {
-				String featName = entry.getKey();
 
-				for (String toClass : this.getLabels()) {
-					if (fromClass.equals(toClass))
-						continue;
-					
-					Transformation trans = new Transformation(featName, fromClass, toClass);
-					
-					Integer gain = transGains.get(trans);
-					
-					if (gain==null)
-						gain=0;
-					
-					if (goldClass.equals(toClass))
-						gain++;
-					  else
-						gain--;
-					
-					transGains.put(trans, gain);
-				}
-			}
-		}
+        for (MapInstance<Integer> instance : this.instances) {
+            String goldClass = instance.getLabel();
+            String fromClass = instance.getCurrentLabel();
+
+            for (Map.Entry<String, Integer> entry : instance.getFeatures().entrySet()) {
+                String featName = entry.getKey();
+
+                for (String toClass : this.getLabels()) {
+                    if (fromClass.equals(toClass))
+                        continue;
+
+                    Transformation trans = new Transformation(featName, fromClass, toClass);
+
+                    Integer gain = transGains.get(trans);
+
+                    if (gain == null)
+                        gain = 0;
+
+                    if (goldClass.equals(toClass))
+                        gain++;
+                    else
+                        gain--;
+
+                    transGains.put(trans, gain);
+                }
+            }
+        }
 		
 		this.highestGain = 0;
 		for (Map.Entry<Transformation, Integer> entry : transGains.entrySet()) {
@@ -125,14 +124,14 @@ public class TBLModel {
 		}	
 	}
 	
-	private String getCurLabel(int i) {
-		String curLabel = this.curLabels.get(i);
-		
-		if (curLabel==null)
-			curLabel = this.defaultLabel;
-		
-		return curLabel;
-	}
+//	private String getCurLabel(int i) {
+//		String curLabel = this.curLabels.get(i);
+//
+//		if (curLabel==null)
+//			curLabel = this.defaultLabel;
+//
+//		return curLabel;
+//	}
 	
 	public void generateModel(File modelFile) {
 		try(BufferedWriter writer = new BufferedWriter(new FileWriter(modelFile))) {

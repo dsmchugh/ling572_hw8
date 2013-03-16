@@ -6,6 +6,7 @@ public class MapInstance<T> implements Instance<T> {
 
 	private String name;
     private String label;
+    private String currentLabel;
     private Map<String,T> features;
 
     public MapInstance() {
@@ -68,5 +69,13 @@ public class MapInstance<T> implements Instance<T> {
     @Override
     public void removeFeature(String feature) {
         this.features.remove(feature);
+    }
+
+    public String getCurrentLabel() {
+       return currentLabel;
+    }
+
+    public void setCurrentLabel(String label) {
+        this.currentLabel = label;
     }
 }
