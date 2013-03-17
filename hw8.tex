@@ -1,0 +1,78 @@
+%%!TEX TS-program = xelatexmk
+\documentclass[oneside,justified,marginals=raggedouter]{tufte-handout}
+\usepackage{fontspec,xltxtra,xunicode}
+\usepackage{enumerate}
+\usepackage{booktabs}
+\usepackage[fleqn]{amsmath}
+\usepackage{amssymb}
+\usepackage{tikz}
+\usetikzlibrary{plotmarks}
+
+\defaultfontfeatures{Mapping=tex-text}
+\setmainfont[%Mapping=tex-text,
+  BoldFont={Haarlemmer MT Std Bold},
+  SlantedFont={Haarlemmer MT Std Italic},
+  ItalicFont={Haarlemmer MT Std Italic},
+  BoldItalicFont={Haarlemmer MT Std Bold Italic},
+  SmallCapsFont={Haarlemmer MT Std: +smcp}
+]{Haarlemmer MT Std}
+\setsansfont[Scale=MatchLowercase,Mapping=tex-text]{TeX Gyre Heros}
+\setmonofont[Scale=MatchLowercase,Ligatures={NoRequired,NoCommon,NoContextual}]{TeX Gyre Cursor}
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+% XeTeX workaround for tufte-latex (otherwise need to use xetex or nols options)
+\renewcommand{\allcapsspacing}[1]{{\addfontfeature{LetterSpace=20.0}#1}}
+\renewcommand{\smallcapsspacing}[1]{{\addfontfeature{LetterSpace=5.0}#1}}
+\renewcommand{\textsc}[1]{\smallcapsspacing{\textsmallcaps{#1}}}
+\renewcommand{\smallcaps}[1]{\smallcapsspacing{\scshape\MakeTextLowercase{#1}}}
+
+\widowpenalty=1000
+\clubpenalty=1000
+\raggedbottom
+\hyphenpenalty=5000
+\tolerance=1000
+
+\title{LING 572 Homework 8}
+\author{David McHugh and Chris Curtis}
+\date{16 Mar 2013}
+
+\clearpage\relax
+
+\begin{document}
+\maketitle
+
+
+\section{Question 3}
+
+Results on the binary classification task:
+\vskip\baselineskip
+
+\begin{tabular}{@{}rrr@{}}
+\toprule
+N   & Training accuracy & Test accuracy \\ \midrule
+1   & 0.452963 & 0.416667 \\
+5   & 0.614444 & 0.613333 \\
+10  & 0.684444 & 0.710000 \\
+20  & 0.753704 & 0.733333 \\
+50  & 0.837037 & 0.773333 \\
+100 & 0.897407 & 0.753333 \\
+150 & 0.926667 & 0.776667 \\
+200 & 0.945556 & 0.776667 \\
+250 & 0.962963 & 0.763333 \\ \bottomrule
+\bottomrule
+\end{tabular}
+\vskip\baselineskip
+From these results, we can see a rapid rise in both training and test
+accuracy with modest increases in number of transformations. However,
+while training accuracy continues to rise rapidly, test accuracy plateaus
+and begins to decline slightly.
+
+This shows that the transformations are
+overfitting the training data. With transformation-based learning, it is
+conceivable that we could eventually train a model that perfectly fits the
+training set—essentially, a 2700-leaf-node decision tree. As these results
+show, that tree would generalize poorly to test data, as it is unlikely
+a test instance would precisely match any of those leaf nodes.
+
+\end{document}
