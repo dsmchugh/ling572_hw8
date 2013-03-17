@@ -73,11 +73,8 @@ public class TBLModel {
 
         for (MapInstance<Integer> instance : this.instances) {
             String curLabel = instance.getCurrentLabel();
-            for (String featName : instance.getFeatures().keySet()) {
-                if (featName.equals(transformation.getFeatName()) && curLabel.equals(transformation.getFromClass())) {
-                    instance.setCurrentLabel(transformation.getToClass());
-                    break;
-                }
+            if (curLabel.equals(transformation.getFromClass()) && instance.containsFeature(transformation.getFeatName())) {
+                instance.setCurrentLabel(transformation.getToClass());
             }
         }
 	}
@@ -89,12 +86,12 @@ public class TBLModel {
             String goldClass = instance.getLabel();
             String fromClass = instance.getCurrentLabel();
 
-            for (Map.Entry<String, Integer> entry : instance.getFeatures().entrySet()) {
-                String featName = entry.getKey();
+            for (String toClass : this.getLabels()) {
+                if (fromClass.equals(toClass))
+                    continue;
 
-                for (String toClass : this.getLabels()) {
-                    if (fromClass.equals(toClass))
-                        continue;
+                for (Map.Entry<String, Integer> entry : instance.getFeatures().entrySet()) {
+                    String featName = entry.getKey();
 
                     Transformation trans = new Transformation(featName, fromClass, toClass);
 
@@ -124,15 +121,6 @@ public class TBLModel {
 		}	
 	}
 	
-//	private String getCurLabel(int i) {
-//		String curLabel = this.curLabels.get(i);
-//
-//		if (curLabel==null)
-//			curLabel = this.defaultLabel;
-//
-//		return curLabel;
-//	}
-	
 	public void generateModel(File modelFile) {
 		try(BufferedWriter writer = new BufferedWriter(new FileWriter(modelFile))) {
 			writer.write(defaultLabel);
@@ -160,7 +148,7 @@ public class TBLModel {
 		while (i<n) {
 			Transformation toTrans = this.transformations.get(i);
 			
-			if (instance.containsFeature(toTrans.getFeatName()) && curLabel.equals(toTrans.getFromClass())) {
+			if (curLabel.equals(toTrans.getFromClass()) && instance.containsFeature(toTrans.getFeatName())) {
 				curLabel = toTrans.getToClass();
 				transList.add(toTrans);
 			}
